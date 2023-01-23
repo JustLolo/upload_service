@@ -3,13 +3,7 @@ import multer from 'multer';
 import fs from 'fs/promises';
 import { isImage, AreImages, orderFilesBySize } from './shared-utils.js';
 import { resBadRequestMsg, ERROR_MESSAGES, parseUploadEndpoint, checkUploadErrors } from "./utils.js";
-// import { checkPrime } from 'crypto';
 import cors from 'cors';
-// import { upload } from './src/routes/upload.js';
-
-
-// backend
-// const multer = require('multer');
 
 const app = express();
 const port = process.env.PORT ?? 3000;
@@ -45,9 +39,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
     resBadRequestMsg(res, _errorMessages);
 
     // remove the files from the memory if there was an error
-    Object.entries(files).forEach(([key, value]) => {
-      delete files[key];
-    });
+    files = {};
 
     return;
   }
@@ -77,19 +69,16 @@ app.post('/upload', upload.single('file'), async (req, res) => {
   const _orderedFiles = orderFilesBySize(_tempFilesArray);
   
   // write the files to the disk and send a success response to the client
-  _orderedFiles.map(async (file, index) => {
-    await fs.writeFile(`./pictures/${index}.${file.originalname.split('.').pop()}`, file.buffer, (err) => {
-      if (err) {
-        console.log(err);
-      }
-      console.log(`File ${index + 1} of ${_totalFiles} saved to disk.`);
-    });
+  let _savedFiles = _orderedFiles.map(async (file, index) => {
+    await fs.writeFile(`./pictures/${index}.${file.originalname.split('.').pop()}`, file.buffer)
+    console.log(`File ${index + 1} of ${_totalFiles} saved to disk.`);
   });
 
-    // remove the files from the memory
-  Object.entries(files).forEach(([key, value]) => {
-    delete files[key];
-  });
+  await Promise.all(_savedFiles).catch((err) => { console.log(err) });
+  console.log('All files saved to disk.');
+
+  // removing the files from the memory, the garbage collector will take care of the rest
+  files = {};
 
   res.status(200).send({
     status: 'success',
@@ -97,20 +86,3 @@ app.post('/upload', upload.single('file'), async (req, res) => {
   });
   
 });
-
-
-
-
-// // Set the endpoint for handling file uploads
-// app.post('/upload', upload.single('file'), (req, res) => {
-//   // Get the file from the request body
-//   const file = req.file;
-
-//   // Do something with the file here, such as saving it to a database or storing it on a file system
-
-//   // Send a response to the client
-//   res.send({
-//     status: 'success',
-//     data: file
-//   });
-// })

@@ -5,7 +5,6 @@
  * 
  */
 export function isImage(file) {
-  console.log("test");
   return (file.type?.toLowerCase() ?? file.mimetype?.toLowerCase() ?? null).startsWith("image/")
   // return file.type?.startsWith('image/');
 }
