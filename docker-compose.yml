@@ -1,0 +1,35 @@
+services:
+  common-node-18:
+    build: 
+      context: .
+      args:
+        DOCKER_USER: $DOCKER_USER
+    environment:
+      VITE_BACKEND: $LOCAL_SERVER_IP
+    profiles:
+      - dev
+
+  frontend-dev:
+    extends:
+      service: common-node-18
+    volumes:
+      - ./client:/app
+      - ./common/shared-utils.js:/app/src/shared-utils.js
+      - shared-bundler-dev:/app/dist:rw
+    ports:
+      - "5173:5173"
+    command: "npm run dev -- --host"
+    
+  backend-dev:
+    extends:
+      service: common-node-18
+    volumes:
+      - shared-bundler-dev:/app/dist:ro
+      - ./common/shared-utils.js:/app/src/shared-utils.js
+      - ./server:/app
+    ports:
+      - "80:3000"
+    command: "npm run dev"
+
+volumes:
+  shared-bundler-dev:

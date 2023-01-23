@@ -1,0 +1,17 @@
+.FormBox .InputBox {
+  border: 1px solid #ccc;
+  margin-bottom: var(--sections-separation);
+}
+
+.FormBox .InputBox label {
+  width: var(--reference-width);
+  height: var(--reference-width);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+
+  font-size: 12px;
+  font-weight: bold;
+}
