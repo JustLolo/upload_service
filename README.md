@@ -1,6 +1,6 @@
 # What is this?
 This is a simple web application that allows you to upload multiple files in a concurrent way to an express server.
-
+I did not impose any size constraints on the uploads. However, if a large set of files is uploaded, the server may crash due to memory overload. This is because I implemented this such as the backend keeps all the files in memory before saving them to disk.
 
 # How to make this run
 ## Install
